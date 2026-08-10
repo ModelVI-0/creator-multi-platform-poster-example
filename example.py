@@ -2,97 +2,84 @@
 """
 creator-multi-platform-poster-example
 
-Minimal example: publish ONE piece of content across MANY platforms at once
-using the ModelVI posting API.
+Publish ONE piece of content across MANY creator platforms at once using the
+public ModelVI partner API — a minimal "cross-platform posting bot" example.
 
-This is an EXAMPLE integration. The endpoint path and the request/response
-shapes below are PLACEHOLDERS to illustrate the pattern only. The real,
-authoritative endpoints, field names, and responses live at:
+  Get your API key:  https://modelvi.com/sign-up
+  API reference:     https://modelvi.com/agent-api  ·  https://modelvi.com/partner-api-docs
 
-    https://modelvi.com/docs
-
-Get an API key: https://modelvi.com
+This is a minimal EXAMPLE (no retries/pagination/media upload). It talks only to
+the public ModelVI partner API: key -> endpoint -> result.
 """
 
 import os
 import sys
+from datetime import datetime, timezone, timedelta
 
 import requests  # pip install requests
 
+# Base URL of the public ModelVI partner API (override via env if needed).
+BASE_URL = os.environ.get("MODELVI_API_BASE", "https://modelvi.com/api/partner/v1")
+API_KEY = os.environ.get("MODELVI_API_KEY")
+SIGNUP_URL = "https://modelvi.com/sign-up"
 
-# ---------------------------------------------------------------------------
-# 1. Configuration — read secrets from the environment, never hard-code them.
-#    Copy .env.example to .env and fill in your values, or export them:
-#        export API_KEY="your_modelvi_api_key_here"
-#        export BASE_URL="https://api.modelvi.com"   # placeholder host
-# ---------------------------------------------------------------------------
-API_KEY = os.environ.get("API_KEY")
-BASE_URL = os.environ.get("BASE_URL", "https://api.modelvi.com")  # PLACEHOLDER host
+# The 14 platform CODES ModelVI posts to (pass these, not brand names):
+PLATFORMS = [
+    "ONLYFANS", "FANSLY", "FANCENTRO", "F2F", "MALOUM", "LOYALFANS", "MYMFANS",
+    "FETLIFE", "FOURBASED", "FANVUE", "BESTFANS", "FANSYME", "BREZZELS", "KNKY",
+]
 
-if not API_KEY:
-    sys.exit(
-        "Missing API_KEY. Get one at https://modelvi.com and set it in your "
-        "environment (see .env.example)."
-    )
-
-# PLACEHOLDER endpoint path — replace with the real endpoint from modelvi.com/docs.
-PUBLISH_PATH = "/v1/publish"  # <-- replace with the real path from https://modelvi.com/docs
+# Post type: 1 = FREE, 2 = FANS, 3 = PAID.
+TYPE_FREE = 1
 
 
-def publish_everywhere(caption, media_urls, platforms):
-    """
-    Publish a single piece of content to several platforms in one API call.
+def _headers():
+    if not API_KEY:
+        sys.exit(
+            f"Missing MODELVI_API_KEY. Get a key at {SIGNUP_URL} and export it:\n"
+            f'  export MODELVI_API_KEY="mvk_<keyId>_<secret>"'
+        )
+    return {"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"}
 
-    This is the "one piece of content -> many platforms at once" pattern:
-    you describe the post once, list the target platforms, and let the
-    ModelVI posting API fan it out for you.
 
-    Args:
-        caption:    The text/caption for the post.
-        media_urls: List of image/video URLs to attach (may be empty).
-        platforms:  List of target platforms to publish to at once.
-    """
+def _payload(resp):
+    """Every authed 200 is an envelope: {success, payload}. Return the payload."""
+    if resp.status_code == 401:
+        sys.exit(f"Unauthorized (401). Get a valid key at {SIGNUP_URL}")
+    resp.raise_for_status()
+    body = resp.json()
+    return body.get("payload", body)
 
-    # PLACEHOLDER request body. The real field names and structure are
-    # documented at https://modelvi.com/docs — this only shows the *idea*.
-    payload = {
-        "caption": caption,      # the text/caption for the post
-        "media": media_urls,     # media URLs to attach (optional)
-        "platforms": platforms,  # fan-out targets, e.g. ["instagram", "tiktok", "x"]
+
+def first_model_id():
+    """Grab a model id to schedule posts for (GET /model_list)."""
+    resp = requests.get(f"{BASE_URL}/model_list", headers=_headers(), timeout=30)
+    models = _payload(resp)
+    if not models:
+        sys.exit("No models on this account yet — add one in your ModelVI dashboard.")
+    # payload shape may be a list or {items:[...]}; handle both defensively.
+    model = (models[0] if isinstance(models, list) else models.get("items", [{}])[0])
+    return model.get("id") or model.get("model")
+
+
+def post_everywhere(caption, platforms, when=None, post_type=TYPE_FREE):
+    """Publish one caption to many platforms in a single POST /schedule call."""
+    model = first_model_id()
+    scheduled_at = (when or datetime.now(timezone.utc) + timedelta(minutes=5))
+    body = {
+        "model": model,
+        "platforms": platforms,                       # list of CODES
+        "title": caption,                             # the caption field is `title`
+        "scheduledAt": scheduled_at.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "type": post_type,
     }
-
-    headers = {
-        "Authorization": f"Bearer {API_KEY}",  # your ModelVI API key
-        "Content-Type": "application/json",
-    }
-
-    url = f"{BASE_URL.rstrip('/')}{PUBLISH_PATH}"
-
-    print(f"POST {url}")
-    print(f"Publishing one post to: {', '.join(platforms)}")
-
-    try:
-        response = requests.post(url, json=payload, headers=headers, timeout=30)
-    except requests.RequestException as err:
-        # Network / DNS / timeout errors. Because BASE_URL and PUBLISH_PATH
-        # above are placeholders, this example will not reach a live server
-        # until you point it at the real endpoint from https://modelvi.com/docs.
-        sys.exit(f"Request failed: {err}")
-
-    # NOTE: the response schema is intentionally NOT assumed here. Do not rely
-    # on any particular field names — check the real response format at
-    # https://modelvi.com/docs. We simply surface the status code and raw body.
-    print(f"HTTP {response.status_code}")
-    print(response.text)
-
-    response.raise_for_status()
+    print(f"POST {BASE_URL}/schedule  → {', '.join(platforms)}")
+    resp = requests.post(f"{BASE_URL}/schedule", json=body, headers=_headers(), timeout=30)
+    result = _payload(resp)
+    print("Scheduled:", result)
+    return result
 
 
 if __name__ == "__main__":
-    # Example: one caption + one image, fanned out to several platforms at once.
-    # Replace the media URL with your own, and trim the platform list as needed.
-    publish_everywhere(
-        caption="New post from my content workflow.",
-        media_urls=["https://example.com/your-image.jpg"],
-        platforms=["instagram", "tiktok", "x", "youtube", "facebook"],
-    )
+    # One caption, fanned out to all 14 platforms at once.
+    post_everywhere("New drop is live ✨", PLATFORMS)

@@ -1,39 +1,36 @@
 ---
-title: creator-multi-platform-poster-example
-description: Example integration for publishing one piece of content across many platforms at once with the ModelVI posting API.
+title: Cross-platform posting bot for creators — ModelVI example
+description: Post once, publish to 14 creator platforms at once via the ModelVI partner API. A minimal, honest cross-platform posting bot example.
 ---
 
-# Multi-Platform Content Poster — Example Integration
+# Cross-platform posting bot — post once, publish to 14 platforms
 
-Publish **one piece of content across many platforms at once** with the
-[ModelVI posting API](https://modelvi.com). This site documents a small,
-open-source example repo for developers building **social media automation for creators**
-and agencies — an honest, minimal reference for a **cross-platform posting bot**.
+Publish **one piece of content across every creator platform at once** with the
+[ModelVI](https://modelvi.com/sign-up?utm_source=github&utm_medium=owned-track&utm_campaign=creator-multi-platform-poster)
+partner API. This documents a small, open-source example of a **cross-platform posting bot** /
+**postbot** for creators and the agencies that manage them.
 
-## What you'll find here
+## The 14 platforms
 
-- A minimal, readable code sample: one API call, many platforms.
-- Environment-based configuration (`API_KEY`, `BASE_URL`) — no hard-coded secrets.
-- Clearly-marked placeholder endpoints so you always defer to the live docs.
+OnlyFans · Fansly · Fancentro · F2F · Maloum · LoyalFans · MYM · Fetlife · Fanvue ·
+4Based · BestFans · Fansyme · Brezzels · Knky. Passed as codes to a single
+`POST /schedule` call.
 
 ## Get started
 
-1. **[Get your API key at modelvi.com →](https://modelvi.com)**
-2. Read the live endpoint reference at [modelvi.com/docs](https://modelvi.com/docs).
-3. Clone the example, add your key, and adapt the publish call.
+1. **[Get your API key →](https://modelvi.com/sign-up?utm_source=github&utm_medium=owned-track&utm_campaign=creator-multi-platform-poster)**
+2. Read the reference at [modelvi.com/agent-api](https://modelvi.com/agent-api).
+3. Clone the example, add your `mvk_` key, and adapt the schedule call.
 
-## The pattern
+## Use cases / keywords
 
-Describe a post once — caption, optional media, and a list of target platforms —
-then send a single request to the ModelVI posting API and let it fan the content
-out. That is the whole idea behind a **cross-platform posting bot** for
-**social media automation creators** and agency teams.
+multi-platform posting bot · postbot maloum · onlyfans posting bot · fansly scheduler ·
+cross-post onlyfans fansly fancentro · content scheduler for creators · social media
+automation for creators.
 
-> **This is an example integration.** The endpoint paths and payloads in the
-> repo are placeholders that illustrate the pattern — the authoritative, live
-> endpoints live at [modelvi.com/docs](https://modelvi.com/docs).
+> **Minimal example.** The authoritative live endpoints are at
+> [modelvi.com/agent-api](https://modelvi.com/agent-api) and
+> [modelvi.com/partner-api-docs](https://modelvi.com/partner-api-docs).
 
-## Links
-
-- Product & API keys: <https://modelvi.com>
-- API documentation: <https://modelvi.com/docs>
+- Get an API key: <https://modelvi.com/sign-up?utm_source=github&utm_medium=owned-track&utm_campaign=creator-multi-platform-poster>
+- Pricing: <https://modelvi.com/pricing>

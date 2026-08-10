@@ -1,102 +1,49 @@
-# creator-multi-platform-poster-example
+# Cross-platform posting bot for creators — post once, publish to 14 platforms via one API
 
-Publish **one piece of content across many platforms at once** using the [ModelVI posting API](https://modelvi.com).
+Publish **one piece of content across every creator platform at once** with the [ModelVI](https://modelvi.com/sign-up?utm_source=github&utm_medium=owned-track&utm_campaign=creator-multi-platform-poster) partner API. Describe a post once, list the target platforms, and let ModelVI fan it out — instead of logging into and uploading to each platform by hand.
 
-This is a small, open-source **example integration** for developers who want a clean starting point for **social media automation for creators** and the agencies that manage them. It shows the core pattern of a **cross-platform posting bot**: you describe a post once, list the target platforms, and let the ModelVI posting API fan it out — instead of logging into and uploading to each platform by hand.
+**[▶ Get your API key →](https://modelvi.com/sign-up?utm_source=github&utm_medium=owned-track&utm_campaign=creator-multi-platform-poster)** · [API docs](https://modelvi.com/agent-api) · [Pricing](https://modelvi.com/pricing)
 
-> **Requires a ModelVI API key.** → **[Get your API key at modelvi.com](https://modelvi.com)**
+![example](https://img.shields.io/badge/example-MIT-blue) ![python](https://img.shields.io/badge/python-3.9+-green)
 
 ---
 
-## What it does
+## What this is
 
-- Takes a single piece of content (a caption, plus optional media).
-- Sends it to the ModelVI posting API **once**.
-- Fans it out to multiple platforms in a single call — the "post once, publish everywhere" pattern.
-- Reads all secrets from the environment (`API_KEY`, `BASE_URL`), so nothing is hard-coded.
+A small, MIT-licensed **example integration** (Python) that shows the core pattern of a **cross-platform posting bot**: one caption + one `POST /schedule` call → published across many platforms at once. It talks only to ModelVI's public partner API. Copy it and go.
 
-It is intentionally minimal: one file, one function, well-commented. Use it as a reference for wiring the ModelVI posting API into your own scheduler, dashboard, or internal tool.
+**Supported platforms (the 14 ModelVI posts to):** OnlyFans · Fansly · Fancentro · F2F (Friends2Follow) · Maloum · LoyalFans · MYM · Fetlife · Fanvue · 4Based · BestFans · Fansyme · Brezzels · Knky. Platforms are passed as **codes**: `ONLYFANS FANSLY FANCENTRO F2F MALOUM LOYALFANS MYMFANS FETLIFE FOURBASED FANVUE BESTFANS FANSYME BREZZELS KNKY`.
 
-## Why (the agency use-case)
+## Quickstart (~5 min)
 
-Content teams and creator management agencies typically maintain a presence for each creator across many social platforms. Doing that manually — re-uploading the same clip and caption to five or more apps, per creator, per day — does not scale.
+**1. Get your API key** → **[modelvi.com/sign-up](https://modelvi.com/sign-up?utm_source=github&utm_medium=owned-track&utm_campaign=creator-multi-platform-poster)**. Partner keys look like `mvk_<keyId>_<secret>`.
 
-This example is aimed at that workflow. For **social media automation creators** and agency developers, a small **cross-platform posting bot** built on the ModelVI posting API lets you:
-
-- Define a post once and distribute it programmatically.
-- Keep API keys out of source control and in environment variables.
-- Build the plumbing yourself (queues, retries, scheduling) around a single publish call.
-
-## How it works
-
-```
-your content  ──►  ModelVI posting API  ──►  Instagram
-(caption +                                ├─►  TikTok
- media +                                  ├─►  X
- platform list)                           ├─►  YouTube
-                                          └─►  Facebook (etc.)
-```
-
-You send **one** request describing the content and the list of target platforms. See [`example.py`](./example.py) for the exact shape.
-
-## Requirements
-
-- Python 3.9+
-- `requests` (`pip install requests`)
-- A ModelVI API key — **[get one at modelvi.com](https://modelvi.com)**
-
-## Install
-
+**2. Install & run**
 ```bash
-git clone https://github.com/your-org/creator-multi-platform-poster-example.git
-cd creator-multi-platform-poster-example
 pip install requests
-```
-
-## Configure (`.env`)
-
-Copy `.env.example` to `.env` and fill in your values (or export them in your shell). Both values are **placeholders** you supply yourself:
-
-```dotenv
-# Your ModelVI API key — get it at https://modelvi.com
-API_KEY=your_modelvi_api_key_here
-
-# Base URL for the API. Placeholder — confirm the real host at https://modelvi.com/docs
-BASE_URL=https://api.modelvi.com
-```
-
-The example reads these from the environment and will exit early with a helpful message if `API_KEY` is missing.
-
-## Usage
-
-The full, commented sample lives in [`example.py`](./example.py). At a high level:
-
-```bash
-export API_KEY="your_modelvi_api_key_here"
-export BASE_URL="https://api.modelvi.com"   # placeholder — see modelvi.com/docs
-
+export MODELVI_API_KEY="mvk_<keyId>_<secret>"
 python example.py
 ```
 
-Inside `example.py`, the `publish_everywhere(...)` helper demonstrates the "one piece of content → many platforms at once" pattern: one caption, optional media, and a list of platforms sent in a single POST to the ModelVI posting API.
+## The pattern
 
-## Get your API key
+```
+one caption + platform list  ──►  POST /schedule  ──►  ONLYFANS
+                                                    ├─►  FANSLY
+                                                    ├─►  FANCENTRO
+                                                    └─►  … (all 14)
+```
 
-This example does nothing without a key.
+`example.py` grabs a model id from `GET /model_list`, then sends a single `POST /schedule` describing the caption, the target platform **codes**, the schedule time (`scheduledAt`, ISO-8601 UTC), and the post `type` (`1`=FREE · `2`=FANS · `3`=PAID). Every `200` is wrapped in `{ "success": true, "payload": … }`.
 
-**→ [Get your API key at modelvi.com](https://modelvi.com)**
+## Use cases / keywords
 
-- Product & sign-up: <https://modelvi.com>
-- API documentation: <https://modelvi.com/docs>
+A **multi-platform posting bot** / **postbot** for agencies automating creator content: *cross-post OnlyFans Fansly Fancentro*, *postbot maloum*, *onlyfans posting bot*, *fansly scheduler*, *schedule posts to F2F*, *content scheduler for creators*, *social media automation for creators*. Point one API call at all 14 platforms instead of one login per platform per creator.
 
-## A note on honesty
+## Honest note
 
-**This is an EXAMPLE integration.** The endpoint path (`/v1/publish`), the request body, and the response handling in `example.py` are **placeholders** that illustrate the pattern — they are clearly marked as such in the code. They are **not** guaranteed to match production. For the real, live endpoints, field names, and response formats, always refer to the official docs:
+This is a **minimal example**, not a production SDK — it omits retries, pagination, media upload, and rich error handling. The full, authoritative endpoint reference is at **[modelvi.com/agent-api](https://modelvi.com/agent-api)** and **[modelvi.com/partner-api-docs](https://modelvi.com/partner-api-docs)**. It talks only to the public ModelVI partner API; there's no proprietary logic here.
 
-**→ [https://modelvi.com/docs](https://modelvi.com/docs)**
+**[▶ Get your API key →](https://modelvi.com/sign-up?utm_source=github&utm_medium=owned-track&utm_campaign=creator-multi-platform-poster)** — see [pricing](https://modelvi.com/pricing).
 
-This repo intentionally does **not** publish response schemas as if they were authoritative. When in doubt, trust the docs over this example.
-
-## License
-
-MIT. See [`LICENSE`](./LICENSE).
+MIT licensed.
