@@ -12,7 +12,7 @@ Publish **one piece of content across every creator platform at once** with the 
 
 A small, MIT-licensed **example integration** (Python) that shows the core pattern of a **cross-platform posting bot**: one caption + one `POST /schedule` call → published across many platforms at once. It talks only to ModelVI's public partner API. Copy it and go.
 
-**Supported platforms (the 14 ModelVI posts to):** OnlyFans · Fansly · Fancentro · F2F (Friends2Follow) · Maloum · LoyalFans · MYM · Fetlife · Fanvue · 4Based · BestFans · Fansyme · Brezzels · Knky. Platforms are passed as **codes**: `ONLYFANS FANSLY FANCENTRO F2F MALOUM LOYALFANS MYMFANS FETLIFE FOURBASED FANVUE BESTFANS FANSYME BREZZELS KNKY`.
+**Supported platforms (the 14 ModelVI posts to):** OnlyFans · Fansly · Fancentro · F2F (Friends2Follow) · Maloum · LoyalFans · MYM · Fetlife · Fanvue · 4Based · BestFans · Fansyme · Brezzels · Knky. Platforms are passed as **codes**: `ONLYFANS FAN FNC F2F MALOUM LOYALFANS MYMFANS FETLIFE FOURBASED FANVUE BESTFANS FANSYME BREZZELS KNKY`.
 
 ## Quickstart (~5 min)
 
@@ -29,8 +29,8 @@ python example.py
 
 ```
 one caption + platform list  ──►  POST /schedule  ──►  ONLYFANS
-                                                    ├─►  FANSLY
-                                                    ├─►  FANCENTRO
+                                                    ├─►  FAN
+                                                    ├─►  FNC
                                                     └─►  … (all 14)
 ```
 

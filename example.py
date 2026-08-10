@@ -25,7 +25,7 @@ SIGNUP_URL = "https://modelvi.com/sign-up"
 
 # The 14 platform CODES ModelVI posts to (pass these, not brand names):
 PLATFORMS = [
-    "ONLYFANS", "FANSLY", "FANCENTRO", "F2F", "MALOUM", "LOYALFANS", "MYMFANS",
+    "ONLYFANS", "FAN", "FNC", "F2F", "MALOUM", "LOYALFANS", "MYMFANS",
     "FETLIFE", "FOURBASED", "FANVUE", "BESTFANS", "FANSYME", "BREZZELS", "KNKY",
 ]
 
